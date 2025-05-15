@@ -1,0 +1,31 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: app
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "8000:80"
+        depends_on:
+            - mongo
+        environment:
+            - DB_CONNECTION=mongodb
+            - DB_HOST=mongo
+            - DB_PORT=27017
+            - DB_DATABASE=laravel
+            - DB_USERNAME=
+            - DB_PASSWORD=
+
+    mongo:
+        image: mongo:7
+        container_name: mongodb
+        restart: always
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongodb_data:/data/db
+
+volumes:
+    mongodb_data:
