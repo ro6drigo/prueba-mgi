@@ -1,0 +1,20 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "blank_line_before_statement": false,
+        "control_structure_braces": false,
+        "nullable_type_declaration": {
+            "syntax": "union"
+        },
+        "phpdoc_align": {
+            "align": "left"
+        },
+        "phpdoc_separation": {
+            "groups": [
+                [
+                    "OA\\*"
+                ]
+            ]
+        }
+    }
+}
