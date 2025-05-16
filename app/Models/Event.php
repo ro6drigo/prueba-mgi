@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
+use MongoDB\Laravel\Relations\BelongsTo;
 
 class Event extends Model
 {
@@ -18,5 +19,10 @@ class Event extends Model
         return [
             'timestamp' => 'datetime',
         ];
+    }
+
+    public function container(): BelongsTo
+    {
+        return $this->belongsTo(Container::class);
     }
 }
