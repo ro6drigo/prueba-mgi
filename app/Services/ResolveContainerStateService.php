@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Container;
+use App\Models\Event;
 
 class ResolveContainerStateService
 {
@@ -14,17 +15,14 @@ class ResolveContainerStateService
 
     public static function call(Container $container): string
     {
-        $acceptable_events = $container->events()
+        $events = $container->events()
             ->where('timestamp', '>=', now()->subHours(static::ACCEPTABLE_HOURS))
-            ->orderBy('timestamp')
-            ->get();
-
-        if ($acceptable_events->count() === 0) return 'unknown';
-
-        $acceptable_quorum_events = $container->events()
-            ->where('timestamp', '>=', now()->subMinutes(static::QUORUM_ACCEPTABLE_MINUTES))
             ->orderBy('timestamp', 'desc')
             ->get();
+
+        if ($events->isEmpty()) return 'unknown';
+
+        $acceptable_quorum_events = $events->filter(fn (Event $event) => $event->timestamp >= now()->subMinutes(static::QUORUM_ACCEPTABLE_MINUTES));
 
         $results = ['state' => null, 'quorum' => 0, 'sources' => []];
         foreach ($acceptable_quorum_events as $event) {
@@ -43,8 +41,8 @@ class ResolveContainerStateService
             $results['state'] = $event->state;
         }
 
-        if ($results['quorum'] >= static::QUORUM_MINIMUM) return $results['state'];
-
-        return $acceptable_events->last()->state;
+        return $results['quorum'] >= static::QUORUM_MINIMUM
+            ? $results['state']
+            : $events->first()->state;
     }
 }
