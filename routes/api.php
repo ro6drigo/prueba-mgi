@@ -7,4 +7,5 @@ use App\Http\Controllers\EventController;
 Route::post('events', [EventController::class, 'store']);
 
 // ContainerController
+Route::get('containers', [ContainerController::class, 'index']);
 Route::get('containers/{id}/status', [ContainerController::class, 'status']);
