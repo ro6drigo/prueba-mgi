@@ -5,25 +5,23 @@
 Se aplicán los principios SOLID de la siguiente manera:
 
 -   **Single Responsibility Principle**:
-    Cada clase tiene una única responsabilidad. Por ejemplo:
+    Cada clase y servicio tiene una única responsabilidad. Ejemplos:
 
-    `StoreEventService`: Encargado exclusivamente de almacenar eventos y actualizar el estado del contenedor.
-
-    `ResolveContainerStateService`: Responsable únicamente de determinar el estado confiable de un contenedor.
-
-    `UpdateStaleContainerStatesService`: Dedicado a actualizar el estado de contenedores con eventos recientes.
+    -   `StoreEventService`: Encargado exclusivamente de almacenar eventos y actualizar el estado del contenedor.
+    -   `ResolveContainerStateService`: Responsable únicamente de determinar el estado confiable de un contenedor.
+    -   `UpdateStaleContainerStatesService`: Dedicado a actualizar el estado de contenedores con eventos recientes.
 
 -   **Open/Closed Principle**:
-    Los servicios están diseñados para ser extensibles sin modificarse. Por ejemplo, podrías agregar nuevas estrategias para la resolución de estado creando nuevas clases sin tocar la lógica actual.
+    Los servicios están diseñados para poder ser extendidos sin modificar su código base. Por ejemplo, se pueden agregar nuevas estrategias de resolución de estado implementando la interfaz `ResolvesContainerStateContract`.
 
 -   **Liskov Substitution Principle**:
-    En este proyecto no se utilizan jerarquías complejas, pero los modelos y servicios pueden ser intercambiados o extendidos sin romper la lógica de negocio.
+    Cada servicio implementa una interfaz (`StoresEventsContract`, `ResolvesContainerStateContract`, `UpdatesStaleContainersContract`), lo que permite intercambiar implementaciones sin afectar al resto del sistema. Esto también simplifica los tests, donde se pueden usar mocks sin romper la lógica.
 
 -   **Interface Segregation Principle**:
-    Por el momento no se han creado interfaces; por el tamaño del proyecto no las vi como necesarias por el momento.
+    Las interfaces están claramente separadas y enfocadas en responsabilidades específicas. Cada servicio implementa su propia interfaz sin verse obligado a depender de métodos innecesarios.
 
 -   **Dependency Inversion Principle**:
-    El proyecto se puede mejorar con interfaces o contenedores personalizados, pero por el momento consideré innecesaria aplicar el principio.
+    Los controladores y otros servicios no dependen directamente de instancias concretas, sino de interfaces, lo cual facilita el desacoplamiento, la extensibilidad y las pruebas unitaria a través de mocks o stubs.
 
 ## 🧠 Estrategia de Razonamiento del "Estado Real"
 
