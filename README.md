@@ -1,3 +1,47 @@
+# 📘 Información Técnica
+
+## 🧱 Aplicación de los Principios SOLID
+
+Se aplicán los principios SOLID de la siguiente manera:
+
+-   **Single Responsibility Principle**:
+    Cada clase tiene una única responsabilidad. Por ejemplo:
+
+    `StoreEventService`: Encargado exclusivamente de almacenar eventos y actualizar el estado del contenedor.
+
+    `ResolveContainerStateService`: Responsable únicamente de determinar el estado confiable de un contenedor.
+
+    `UpdateStaleContainerStatesService`: Dedicado a actualizar el estado de contenedores con eventos recientes.
+
+-   **Open/Closed Principle**:
+    Los servicios están diseñados para ser extensibles sin modificarse. Por ejemplo, podrías agregar nuevas estrategias para la resolución de estado creando nuevas clases sin tocar la lógica actual.
+
+-   **Liskov Substitution Principle**:
+    En este proyecto no se utilizan jerarquías complejas, pero los modelos y servicios pueden ser intercambiados o extendidos sin romper la lógica de negocio.
+
+-   **Interface Segregation Principle**:
+    Por el momento no se han creado interfaces; por el tamaño del proyecto no las vi como necesarias por el momento.
+
+-   **Dependency Inversion Principle**:
+    El proyecto se puede mejorar con interfaces o contenedores personalizados, pero por el momento consideré innecesaria aplicar el principio.
+
+## 🧠 Estrategia de Razonamiento del "Estado Real"
+
+La lógica para determinar el estado real de un contenedor está basada en la siguiente lógica:
+
+1. Ventana de eventos recientes:
+   Solo se consideran eventos dentro de la última hora (ACCEPTABLE_HOURS) como válidos para determinar el estado actual.
+
+2. Quórum por fuente confiable:
+   Se requiere un mínimo de 3 fuentes diferentes que coincidan en el mismo estado dentro de los últimos 30 minutos (QUORUM_ACCEPTABLE_MINUTES) para considerar un estado como "confiable".
+
+3. Fallback de último evento:
+   Si no hay quórum suficiente, se toma el estado del evento más reciente dentro del rango aceptable.
+
+Esto ayuda a que el sistema sea más tolerante a errores, se adapte a datos inconsistentes y refleje el estado más probable, sin depender de una única fuente.
+
+---
+
 # 🚀 Cómo Levantar el Proyecto
 
 ## 🛠️ 1. Requisitos Previos
