@@ -6,6 +6,7 @@ services:
         container_name: app
         volumes:
             - ./:/var/www/html
+            - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
         ports:
             - "8000:80"
         depends_on:

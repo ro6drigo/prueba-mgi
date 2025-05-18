@@ -11,6 +11,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Instalar la extensión MongoDB
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
+# Instalar la extensión XDebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 # Activar mod_rewrite de Apache (importante para Laravel)
 RUN a2enmod rewrite
 
