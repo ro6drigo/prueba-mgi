@@ -1,61 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Cómo Levantar el Proyecto
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🛠️ 1. Requisitos Previos
 
-## About Laravel
+Asegurarse de tener instalados los siguientes programas en el sistema:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   Docker y Docker Compose
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📥 2. Clonar el Repositorio
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```sh
+git clone https://github.com/ro6drigo/prueba-mgi.git
+cd prueba-mgi
+```
 
-## Learning Laravel
+## 🐳 3. Levantar los contenedores con Docker
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+La primera vez tenemos que construir los contenedores
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```sh
+docker-compose build
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Luego iniciar los contenedores como siempre (-d detached mode: ejecuta los contenedores en background)
 
-## Laravel Sponsors
+```sh
+docker-compose up -d
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Esto iniciará los contenedores de **PHP** y **MongoDB**.
 
-### Premium Partners
+Cuando necesites detener los contendores, puedes hacerlo con el siguiente comando:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```sh
+docker-compose down
+```
 
-## Contributing
+## 📦 4. Instalar Dependencias
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```sh
+docker exec -it app composer install
+# o
+composer install
+```
 
-## Code of Conduct
+Esto instalará todas las dependencias necesarias en el contenedor de PHP.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## ⚙️ 5. Configurar Variables de Entorno
 
-## Security Vulnerabilities
+```sh
+docker exec -it app cp .env.example .env
+docker exec -it app php artisan key:generate
+# o
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Edita el archivo `.env` para configurar la base de datos y otras variables necesarias.
 
-## License
+```sh
+# .env
+DB_CONNECTION=mongodb
+DB_HOST=mongo
+DB_PORT=27017
+DB_DATABASE=prueba_mgi
+DB_USERNAME=
+DB_PASSWORD=
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+# 📡 Documentación de la API
+
+## 🚀 Acceso a la Documentación
+
+Puedes acceder a la documentación técnica de la API a través de la siguiente URL: `http://127.0.0.1:8000/api/documentation`
+
+## 🎟 Endpoints disponibles
+
+Documentación completa disponible en `/api/documentation`.
+
+-   `POST /api/events`: Registrar un nuevo evento de estado.
+-   `GET /api/containers`: Listar todos los contenedores con su estado verificado.
+-   `GET /api/containers/{id}/status`: Consultar el estado confiable de un contenedor.
+
+## ⚙️ Generar la Documentación
+
+Si necesitas regenerar la documentación, puedes hacerlo con el siguiente comando:
+
+```sh
+docker exec -it app php artisan l5-swagger:generate
+# o
+php artisan l5-swagger:generate
+```
+
+Este comando actualizará la documentación basada en los cambios recientes en los controladores y rutas de la API.
+
+## 📌 Notas
+
+-   Asegúrate de que la aplicación esté en ejecución antes de acceder a la documentación.
+
+-   Si la documentación no se actualiza, intenta limpiar la caché con:
+
+    ```sh
+    docker exec -it app php artisan config:clear && php artisan cache:clear
+    # o
+    php artisan config:clear && php artisan cache:clear
+    ```
+
+---
+
+# 🔍 Estrategia para determinar el estado confiable
+
+Se combinan tres estrategias:
+
+-   **Quórum**: Se requieren al menos 3 eventos coincidentes en los últimos 30 minutos para aceptar un estado.
+-   **Last update**: Si no se alcanza quórum, se toma el evento más reciente de la última hora.
+-   **Timeout**: Si no hay eventos recientes, se asume como estado `unknown`.
+
+---
+
+# ✅ Pruebas
+
+-   Ejecuta `docker exec -it app php artisan test` o `php artisan test`
