@@ -9,12 +9,16 @@ use Tests\TestCase;
 
 class ResolveContainerStateServiceTest extends TestCase
 {
+    protected ResolveContainerStateService $containerStateResolver;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         Container::truncate();
         Event::truncate();
+
+        $this->containerStateResolver = new ResolveContainerStateService;
     }
 
     public function test_returns_unknown_if_no_recent_events()
@@ -27,7 +31,7 @@ class ResolveContainerStateServiceTest extends TestCase
             'timestamp' => now()->subHours(2), // Fuera de la ventana de 1 hora
         ]);
 
-        $result = ResolveContainerStateService::call($container);
+        $result = $this->containerStateResolver->resolve($container);
 
         $this->assertEquals('unknown', $result);
     }
@@ -46,7 +50,7 @@ class ResolveContainerStateServiceTest extends TestCase
             ]);
         }
 
-        $result = ResolveContainerStateService::call($container);
+        $result = $this->containerStateResolver->resolve($container);
 
         $this->assertEquals('damaged', $result);
     }
@@ -78,7 +82,7 @@ class ResolveContainerStateServiceTest extends TestCase
         ]);
 
         // No hay quórum, así que toma el evento más reciente dentro de la ventana de 1 hora
-        $result = ResolveContainerStateService::call($container);
+        $result = $this->containerStateResolver->resolve($container);
 
         $this->assertEquals('operational', $result);
     }
@@ -113,7 +117,7 @@ class ResolveContainerStateServiceTest extends TestCase
             'timestamp' => $now->copy()->subMinutes(2),
         ]);
 
-        $result = ResolveContainerStateService::call($container);
+        $result = $this->containerStateResolver->resolve($container);
 
         // Solo se cuentan fuentes distintas, se alcanza quórum
         $this->assertEquals('damaged', $result);

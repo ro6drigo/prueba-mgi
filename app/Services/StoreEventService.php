@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Contracts\ResolvesContainerStateContract;
+use App\Contracts\StoresEventsContract;
 use App\Models\Container;
 use App\Models\Event;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
-class StoreEventService
+class StoreEventService implements StoresEventsContract
 {
-    public static function call(string $containerId, string $state, Carbon $timestamp, string $source): Event
+    public function __construct(private ResolvesContainerStateContract $containerStateResolver) {}
+
+    public function store(string $containerId, string $state, CarbonInterface $timestamp, string $source): Event
     {
         $event = Event::create([
             'container_id' => $containerId,
@@ -20,7 +24,7 @@ class StoreEventService
         $container = Container::firstOrCreate(['id' => $containerId], ['state' => 'unknown']);
 
         $container->update([
-            'state' => ResolveContainerStateService::call($container),
+            'state' => $this->containerStateResolver->resolve($container),
         ]);
 
         return $event;

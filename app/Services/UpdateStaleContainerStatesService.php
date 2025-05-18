@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
+use App\Contracts\ResolvesContainerStateContract;
+use App\Contracts\UpdatesStaleContainersContract;
 use App\Models\Container;
 
-class UpdateStaleContainerStatesService
+class UpdateStaleContainerStatesService implements UpdatesStaleContainersContract
 {
-    public static function call(): void
+    public function __construct(private ResolvesContainerStateContract $containerStateResolver) {}
+
+    public function updateStaleContainers(): void
     {
         $containers = Container::all();
 
@@ -14,7 +18,7 @@ class UpdateStaleContainerStatesService
             $has_updates = $container->events()->where('created_at', '>', $container->updated_at)->exists();
 
             if ($has_updates) {
-                $container->update(['state' => ResolveContainerStateService::call($container)]);
+                $container->update(['state' => $this->containerStateResolver->resolve($container)]);
                 $container->touch();
             }
         }

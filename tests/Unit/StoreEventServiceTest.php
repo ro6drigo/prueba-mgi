@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Contracts\ResolvesContainerStateContract;
 use App\Models\Container;
 use App\Models\Event;
 use App\Services\StoreEventService;
@@ -9,19 +10,23 @@ use Tests\TestCase;
 
 class StoreEventServiceTest extends TestCase
 {
+    protected StoreEventService $eventStorer;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         Container::truncate();
         Event::truncate();
+
+        $this->eventStorer = new StoreEventService(app(ResolvesContainerStateContract::class));
     }
 
     public function test_creates_event_and_new_container()
     {
         $now = now();
 
-        StoreEventService::call(
+        $this->eventStorer->store(
             'new_container',
             'operational',
             $now,
@@ -45,7 +50,7 @@ class StoreEventServiceTest extends TestCase
         $container = Container::factory()->create(['state' => 'unknown']);
         $now = now();
 
-        StoreEventService::call(
+        $this->eventStorer->store(
             $container->id,
             'damaged',
             $now,

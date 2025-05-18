@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Contracts\ResolvesContainerStateContract;
 use App\Models\Container;
 use App\Models\Event;
 
-class ResolveContainerStateService
+class ResolveContainerStateService implements ResolvesContainerStateContract
 {
     private const int ACCEPTABLE_HOURS = 1;
 
@@ -13,7 +14,7 @@ class ResolveContainerStateService
 
     private const int QUORUM_MINIMUM = 3;
 
-    public static function call(Container $container): string
+    public function resolve(Container $container): string
     {
         $events = $container->events()
             ->where('timestamp', '>=', now()->subHours(static::ACCEPTABLE_HOURS))

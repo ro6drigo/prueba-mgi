@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ResolvesContainerStateContract;
+use App\Contracts\UpdatesStaleContainersContract;
 use App\Http\Resources\ContainerResource;
 use App\Models\Container;
-use App\Services\ResolveContainerStateService;
-use App\Services\UpdateStaleContainerStatesService;
 use Illuminate\Http\JsonResponse;
 
 class ContainerController extends Controller
 {
+    public function __construct(
+        private ResolvesContainerStateContract $containerStateResolver,
+        private UpdatesStaleContainersContract $staleContainersUpdater
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/api/containers",
@@ -22,7 +27,7 @@ class ContainerController extends Controller
      */
     public function index(): JsonResponse
     {
-        UpdateStaleContainerStatesService::call();
+        $this->staleContainersUpdater->updateStaleContainers();
 
         $containers = Container::all();
 
@@ -44,7 +49,7 @@ class ContainerController extends Controller
     {
         $container = Container::with('events')->findOrFail($id);
 
-        $container->update(['state' => ResolveContainerStateService::call($container)]);
+        $container->update(['state' => $this->containerStateResolver->resolve($container)]);
         $container->touch();
 
         return response()->json(['data' => $container->state], 200);

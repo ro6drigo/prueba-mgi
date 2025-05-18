@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Contracts\ResolvesContainerStateContract;
 use App\Models\Container;
 use App\Models\Event;
 use App\Services\UpdateStaleContainerStatesService;
@@ -9,12 +10,16 @@ use Tests\TestCase;
 
 class UpdateStaleContainerStatesServiceTest extends TestCase
 {
+    protected UpdateStaleContainerStatesService $staleContainersUpdater;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         Container::truncate();
         Event::truncate();
+
+        $this->staleContainersUpdater = new UpdateStaleContainerStatesService(app(ResolvesContainerStateContract::class));
     }
 
     public function test_updates_containers_with_newer_events()
@@ -33,7 +38,7 @@ class UpdateStaleContainerStatesServiceTest extends TestCase
             'created_at' => $now,
         ]);
 
-        UpdateStaleContainerStatesService::call();
+        $this->staleContainersUpdater->updateStaleContainers();
 
         $container->refresh();
 
@@ -56,7 +61,7 @@ class UpdateStaleContainerStatesServiceTest extends TestCase
             'created_at' => $now->copy()->subMinutes(20),
         ]);
 
-        UpdateStaleContainerStatesService::call();
+        $this->staleContainersUpdater->updateStaleContainers();
 
         $container->refresh();
 
@@ -67,6 +72,6 @@ class UpdateStaleContainerStatesServiceTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
 
-        UpdateStaleContainerStatesService::call();
+        $this->staleContainersUpdater->updateStaleContainers();
     }
 }

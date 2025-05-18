@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\StoresEventsContract;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Resources\EventResource;
-use App\Services\StoreEventService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 
 class EventController extends Controller
 {
+    public function __construct(private StoresEventsContract $eventStorer) {}
+
     /**
      * @OA\Post(
      *     path="/api/events",
@@ -23,7 +25,7 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request): JsonResponse
     {
-        $event = StoreEventService::call(
+        $event = $this->eventStorer->store(
             $request->validated('containerId'),
             $request->validated('state'),
             Carbon::parse($request->validated('timestamp')),
