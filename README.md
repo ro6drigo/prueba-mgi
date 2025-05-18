@@ -121,4 +121,16 @@ Se combinan tres estrategias:
 
 # ✅ Pruebas
 
--   Ejecuta `docker exec -it app php artisan test` o `php artisan test`
+```sh
+docker exec -it app php artisan test
+# o
+php artisan test
+```
+
+Si necesitas poder visualizar el coverage de los test, puedes hacerlo con el siguiente comando:
+
+```sh
+docker exec -it app php artisan test --coverage
+# o
+php artisan test --coverage
+```
